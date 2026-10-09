@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 const src=readFileSync(new URL('../game.js',import.meta.url),'utf8');
+const artSource=readFileSync(new URL('../hd-art.js',import.meta.url),'utf8');
 let frame=0,now=1000,drawCount=0;
 const gfx=new Proxy({imageSmoothingEnabled:false},{get(o,k){if(k in o)return o[k];return (...args)=>{drawCount++}},set(o,k,v){o[k]=v;return true}});
 const fakeNode=()=>({innerHTML:'',textContent:'',dataset:{},setAttribute(){},addEventListener(){},requestFullscreen(){},getContext(){return gfx}});
@@ -11,6 +12,11 @@ const memory=new Map();
 const localStorage={getItem:k=>memory.get(k)||null,setItem:(k,v)=>memory.set(k,String(v))};
 const context={document,window:{addEventListener(){}},localStorage,performance:{now:()=>now},requestAnimationFrame:fn=>{frame++;}};
 const exported='\n;globalThis.testApi={game,CHAPTERS,startFresh,nextDialog,storyTalk,sideTalk,bossIntro,attack,defeat,interactExit,saveGame,loadGame,render,tryMove,shopBuy,usePotion,restoreAfterDeath,press,tick};';
+runInNewContext(artSource,context,{filename:'hd-art.js',timeout:5000});
+context.window.GYArt=context.GYArt;
+assert.equal(typeof context.GYArt.tile,'function','HD terrain painter loaded');
+assert.equal(typeof context.GYArt.actor,'function','HD sprite painter loaded');
+assert.equal(typeof context.GYArt.title,'function','HD title scene loaded');
 runInNewContext(src+exported,context,{filename:'game.js',timeout:5000});
 const a=context.testApi;
 let checks=0;
@@ -19,6 +25,18 @@ function eq(actual,expected,msg){assert.equal(actual,expected,msg);checks++}
 function finishDialog(){let count=0;while(a.game.mode==='dialog'&&count++<30)a.nextDialog();ok(count<30,'dialog completed')}
 function setMode(mode){a.game.mode=mode;a.render(now);ok(drawCount>0,'render '+mode)}
 setMode('title');
+assert.equal(context.document.querySelector('#chapterInfo').innerHTML.includes('第'),true);
+const art=context.GYArt;
+const opsBefore=drawCount;
+for(const biome of ['spring','autumn','fort','river','snow']){
+ for(let type=0;type<=13;type++)art.tile(gfx,type,10,10,6,6,biome,false);
+ art.atmosphere(gfx,biome,1000,0,0);
+}
+for(let k=0;k<6;k++){art.actor(gfx,10,20,k,k%4,k%2,1);art.portrait(gfx,0,0,k)}
+for(const type of ['slash','special','hit','hurt','dust'])art.effect(gfx,{type,dir:1},10,10,100);
+art.panel(gfx,0,0,176,100);
+art.hud(gfx,{hp:70,mp:20,level:5},{maxHp:100,maxMp:40});
+ok(drawCount>opsBefore+200,'HD art renders terrain, NPCs, portraits, FX and UI');
 a.startFresh();finishDialog();
 eq(a.CHAPTERS.length,9,'nine-story campaign');
 eq(a.CHAPTERS[0].boss,'颜良','starts at White Horse');
