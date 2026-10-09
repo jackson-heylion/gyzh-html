@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111d22">
+<meta name="description" content="关羽正传2：KJava 176×220 像素风浏览器重制版。独立绘制素材，支持键盘与触控、装备、任务、战斗与存档。">
+<title>关羽正传2 · 怀旧重制</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="site">
+  <header class="mast">
+    <div class="eyebrow"><span class="dot"></span> CLASSIC J2ME · WEB REMAKE <span class="version">v1.0</span></div>
+    <h1>关羽正传 <em>Ⅱ</em></h1>
+    <p>一身忠义 · 万里征途</p>
+  </header>
+  <main class="layout">
+    <section class="phone" aria-label="176乘220经典手机游戏">
+      <div class="phone-top"><span class="speaker"></span><span class="brand">RETRO <small>JAVA</small></span><span class="camera"></span></div>
+      <div class="screen-frame">
+        <div class="screen-shine"></div>
+        <canvas id="game" width="176" height="220" role="img" aria-label="关羽正传2游戏屏幕">请使用支持 Canvas 的浏览器</canvas>
+      </div>
+      <div class="soft-legend"><span>左键 · 菜单</span><span>右键 · 返回</span></div>
+      <div class="controls">
+        <button class="softkey leftsoft" type="button" data-key="menu" aria-label="打开菜单">菜单</button>
+        <div class="dpad" aria-label="方向控制">
+          <button type="button" class="up" data-key="up" aria-label="向上">▲</button>
+          <button type="button" class="left" data-key="left" aria-label="向左">◀</button>
+          <button type="button" class="center" data-key="ok" aria-label="确定或普通攻击">OK</button>
+          <button type="button" class="right" data-key="right" aria-label="向右">▶</button>
+          <button type="button" class="down" data-key="down" aria-label="向下">▼</button>
+        </div>
+        <button class="softkey rightsoft" type="button" data-key="back" aria-label="返回或对话">返回</button>
+        <div class="numkeys" aria-label="数字键盘">
+          <button data-key="1">1<small>属性</small></button><button data-key="2">2<small>↑</small></button><button data-key="3">3<small>任务</small></button>
+          <button data-key="4">4<small>←</small></button><button data-key="5">5<small>攻击</small></button><button data-key="6">6<small>→</small></button>
+          <button data-key="7">7<small>装备</small></button><button data-key="8">8<small>↓</small></button><button data-key="9">9<small>地图</small></button>
+          <button data-key="star">✳<small>绝技</small></button><button data-key="0">0<small>菜单</small></button><button data-key="hash">＃<small>丹药</small></button>
+        </div>
+      </div>
+      <div class="phone-foot">MIDP 2.0 <span>● ● ●</span> 176 × 220</div>
+    </section>
+    <aside class="sidebar">
+      <div class="panel story"><span class="label">THE LEGEND</span><h2>单刀赴会，义薄云天。</h2><p>从涿郡桃园到麦城风雪，再走一回关云长的英雄之路。重现老式 Java 手机的窄屏画面、方向键手感与像素 RPG 冒险。</p><div class="ornament">青 龙 偃 月 · 忠 义 千 秋</div></div>
+      <div class="panel quick">
+        <div class="panel-title">游戏操作 <span>CONTROLS</span></div>
+        <div class="key-help"><span>移动</span><b>↑ ↓ ← → / WASD</b></div>
+        <div class="key-help"><span>攻击 / 确定</span><b>5 / Enter / 空格</b></div>
+        <div class="key-help"><span>对话 / 返回</span><b>Z / Esc</b></div>
+        <div class="key-help"><span>青龙斩</span><b>* / X</b></div>
+        <div class="key-help"><span>服用丹药</span><b># / H</b></div>
+        <div class="key-help"><span>系统菜单</span><b>0 / M</b></div>
+      </div>
+      <div class="toolbar">
+        <button id="saveBtn" type="button">◎ 保存进度</button>
+        <button id="loadBtn" type="button">↻ 读取存档</button>
+        <button id="muteBtn" type="button" aria-pressed="false">♫ 开启声音</button>
+        <button id="fullBtn" type="button">⛶ 全屏游戏</button>
+      </div>
+      <div class="panel chapter-guide"><div class="panel-title">征途纪事 <span>CHAPTERS</span></div><div id="chapterInfo">载入游戏中…</div></div>
+      <p class="disclaimer">非商业独立致敬重制。像素画面与音乐由本项目程序原创生成；未使用原游戏 ROM/JAR 素材。剧情和战斗机制为参考三国题材的重新设计，并非原版逐帧移植。</p>
+    </aside>
+  </main>
+  <footer><span>关羽正传Ⅱ · HTML5 REMAKE</span><a href="https://github.com/jackson-heylion/gyzh-html" target="_blank" rel="noopener">GITHUB ↗</a></footer>
+</div>
+<script type="module" src="game.js"></script>
+</body>
+</html>
