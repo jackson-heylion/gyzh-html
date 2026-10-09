@@ -1,0 +1,16 @@
+{
+  "name": "gyzh-html",
+  "version": "1.0.0",
+  "private": true,
+  "description": "关羽正传2 J2ME-inspired no-dependencies pixel RPG, deployable as static HTML5 site",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node tests/smoke.mjs",
+    "check": "npm run test && npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
