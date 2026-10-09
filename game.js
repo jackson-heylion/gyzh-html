@@ -1,8 +1,11 @@
 /* 关羽正传Ⅱ · Original HTML5 homage for 176×220 KJava-era screens.
    All game art is generated using Canvas primitives; no original JAR assets. */
 const canvas=document.getElementById('game'), g=canvas.getContext('2d',{alpha:false});
-const W=176,H=220,T=16,SAVE='gyzh2_web_save_v1';
+// Logical coordinates stay at 176x220 for backwards compatible gameplay and save files.
+// Rendering happens in a true 352x440 backing store; HDArt paints at half-logical-pixel precision.
+const W=176,H=220,T=16,RENDER_SCALE=2,SAVE='gyzh2_web_save_v1';
 g.imageSmoothingEnabled=false;
+g.setTransform(RENDER_SCALE,0,0,RENDER_SCALE,0,0);
 const $=s=>document.querySelector(s), clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
 const CHAPTERS=[
  {
@@ -525,9 +528,9 @@ function tick(now){
 const rect=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h))};
 const text=(t,x,y,color='#f4e6bc',size=10,align='left')=>{g.font='bold '+size+'px "Microsoft YaHei","PingFang SC",sans-serif';g.textAlign=align;g.textBaseline='top';g.fillStyle='#0a1219';g.fillText(String(t),Math.round(x)+1,Math.round(y)+1);g.fillStyle=color;g.fillText(String(t),Math.round(x),Math.round(y))};
 function wrap(s,max=14){const out=[];let line='';for(const ch of Array.from(s)){if(ch==='\n'){out.push(line);line='';continue}if((/[ -~]/.test(ch)? .55:1)+(Array.from(line).reduce((a,b)=>a+(/[ -~]/.test(b)?.55:1),0))>max){out.push(line);line=''}line+=ch}if(line)out.push(line);return out}
-function panel(x,y,w,h){rect(x,y,w,h,'#0b1319');rect(x+1,y+1,w-2,h-2,'#c69e57');rect(x+2,y+2,w-4,h-4,'#253f46');rect(x+4,y+4,w-8,h-8,'#14292f');for(const xx of [x+2,x+w-5])for(const yy of [y+2,y+h-5])rect(xx,yy,3,3,'#edca7b')}
+function panel(x,y,w,h){if(window.GYArt?.panel){window.GYArt.panel(g,x,y,w,h);return}rect(x,y,w,h,'#0b1319');rect(x+1,y+1,w-2,h-2,'#c69e57');rect(x+2,y+2,w-4,h-4,'#253f46');rect(x+4,y+4,w-8,h-8,'#14292f');for(const xx of [x+2,x+w-5])for(const yy of [y+2,y+h-5])rect(xx,yy,3,3,'#edca7b')}
 function bar(x,y,w,val,max,color){rect(x,y,w,5,'#07171c');rect(x+1,y+1,w-2,3,'#364148');rect(x+1,y+1,Math.floor((w-2)*clamp(val/max,0,1)),3,color)}
-function drawTile(t,x,y,ix,iy,biome){
+function drawTile(t,x,y,ix,iy,biome){if(window.GYArt?.tile){window.GYArt.tile(g,t,x,y,ix,iy,biome,game.cleared);return}
  const n=noise(ix,iy,game.chapter+6);
  const grass=biome==='snow'?'#bdc9bd':biome==='autumn'?'#7e9567':biome==='river'?'#62876a':'#6b9b73';
  const dirt=biome==='snow'?'#c1b7a5':'#c0a67a';
@@ -541,7 +544,7 @@ function drawTile(t,x,y,ix,iy,biome){
  if(t===6||t===12){rect(x,y,16,16,'#9b644c');rect(x,y,16,3,'#513b36');for(let i=2;i<16;i+=5)rect(x+i,y+4,3,11,'#bc8861');rect(x,y+14,16,2,'#665344');if(t===12){rect(x+4,y+7,8,9,'#292522');rect(x+6,y+8,4,8,'#664e35')}}
  if(t===13){rect(x,y,16,16,'#bfa579');rect(x+3,y+2,10,12,'#5c463c');rect(x+5,y+4,6,9,game.cleared?'#d6ba73':'#41372e');rect(x+3,y+1,10,2,'#9a674e')}
 }
-function actor(x,y,kind=0,face=2,phase=0,scale=1){
+function actor(x,y,kind=0,face=2,phase=0,scale=1){if(window.GYArt?.actor){window.GYArt.actor(g,x,y,kind,face,phase,scale);return}
  // 16x21 pixel actor silhouettes. kind: hero 0, villager 1, merchant 2, soldier 3, boss 4, ally 5
  g.save();g.translate(Math.round(x),Math.round(y));g.scale(scale,scale);
  const skin=kind===4?'#df9771':'#e0a77b',robe=['#266f5b','#988264','#795b43','#834b45','#8f3330','#385f81'][kind]||'#777';
@@ -557,12 +560,12 @@ function actor(x,y,kind=0,face=2,phase=0,scale=1){
  else{rect(4,2,11,2,'#554538');rect(7,5,2,1,'#302a22')}
  g.restore();
 }
-function drawPortrait(x,y,kind=0){
+function drawPortrait(x,y,kind=0){if(window.GYArt?.portrait){window.GYArt.portrait(g,x,y,kind);return}
  rect(x,y,35,38,'#805f42');rect(x+2,y+2,31,34,'#b6a37b');rect(x+4,y+4,27,31,'#40664c');
  if(kind===0){rect(x+8,y+10,20,17,'#d89770');rect(x+5,y+6,25,7,'#175541');rect(x+9,y+3,18,5,'#286d52');rect(x+11,y+23,17,12,'#192424');rect(x+13,y+17,3,2,'#402c2b');rect(x+22,y+17,3,2,'#402c2b');rect(x+15,y+21,9,2,'#763528');rect(x+17,y+25,6,10,'#232a28')}
  else {rect(x+8,y+11,20,17,'#d7a47f');rect(x+6,y+6,23,8,kind===4?'#80372d':'#655444');rect(x+13,y+18,3,2,'#342827');rect(x+23,y+18,3,2,'#342827');rect(x+15,y+26,10,6,'#42342e')}
 }
-function hud(){
+function hud(){if(window.GYArt?.hud){window.GYArt.hud(g,game.hero,{maxHp:maxHp(),maxMp:maxMp()});return}
  const h=game.hero;rect(0,0,W,24,'#14272e');rect(0,23,W,1,'#c5a46c');text('关',4,3,'#edcc86',13);text('LV'+h.level,23,4,'#e3dcc0',9);
  bar(55,4,72,h.hp,maxHp(),'#c85c49');bar(55,13,72,h.mp,maxMp(),'#478cbd');
  text(h.hp+'/'+maxHp(),131,2,'#edcdb7',8);text(h.mp+'/'+maxMp(),131,12,'#a7d4ee',8);
@@ -590,6 +593,7 @@ function drawWorld(now){
  if(now<game.hurtAt&&Math.floor(now/90)%2)g.globalAlpha=.38;
  actor(sx,sy-4,0,h.dir,Math.floor(now/140)%2);g.globalAlpha=1;
  for(const e of game.effects){const ex=e.x*T-cam.x,ey=e.y*T-cam.y+24,age=now-e.t;
+  if(window.GYArt?.effect){window.GYArt.effect(g,e,ex,ey,age);continue}
   if(e.type==='slash'||e.type==='special'){
    const dirs=[[0,-1],[1,0],[0,1],[-1,0]],v=dirs[e.dir];g.save();g.strokeStyle=e.type==='special'?'#68efe9':'#fbeaa5';g.lineWidth=e.type==='special'?4:3;g.globalAlpha=1-age/(e.type==='special'?440:270);g.beginPath();g.arc(ex+8+v[0]*12,ey+6+v[1]*9,e.type==='special'?28:18,(e.dir-1)*Math.PI/2,(e.dir+.8)*Math.PI/2);g.stroke();g.restore();
    if(e.type==='special')for(let k=0;k<6;k++)rect(ex+Math.sin(k*2)*21,ey+Math.cos(k*2)*15,2,2,'#c6fff1');
@@ -597,6 +601,7 @@ function drawWorld(now){
   else if(e.type==='hurt'){rect(ex,ey,16,16,'#ef6d6055')}
   else if(e.type==='dust'){rect(ex+5,ey+14,5,2,'#cbb390')}
  }
+ if(window.GYArt?.atmosphere)window.GYArt.atmosphere(g,CHAPTERS[game.chapter].biome,now,cam.x,cam.y);
  for(const e of game.floaters){const age=(now-e.t)/780;g.globalAlpha=1-age;text(e.text,e.x*T-cam.x+8,e.y*T-cam.y+3-age*17,e.color,9,'center')}g.globalAlpha=1;
  g.restore();
  // bottom action bar
@@ -606,7 +611,7 @@ function drawWorld(now){
  text('5攻击  *绝技  #丹药  0菜单',4,211,'#a9b9b6',8);
  if(now<game.toastUntil){rect(7,171,162,19,'#102027');rect(8,172,160,17,'#455a52');rect(10,174,156,13,'#233536');text(game.toastText,88,176,'#f5dfab',9,'center')}
 }
-function titleScreen(now){
+function titleScreen(now){if(window.GYArt?.title){window.GYArt.title(g,now,game.titleIndex,saveExists());return}
  rect(0,0,W,H,'#131f25');
  // distant stars and landscape
  for(let i=0;i<28;i++){let x=(noise(i,1,47)*176)|0,y=(noise(i,4,29)*95)|0;rect(x,y,1,1,'#c0a36f')}
