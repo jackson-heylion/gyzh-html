@@ -1,0 +1,32 @@
+name: Static site quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Smoke test (no dependencies)
+        run: npm test
+      - name: Build ChatGPT Sites bundle
+        run: npm run build
+      - name: Check bundled output
+        run: |
+          test -s dist/index.html
+          test -s dist/game.js
+          test -s dist/style.css
+          test -s dist/favicon.svg
+      - name: Upload static site
+        uses: actions/upload-artifact@v4
+        with:
+          name: gyzh-html-site
+          path: dist/
