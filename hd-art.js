@@ -94,7 +94,7 @@ function river(c,x,y,ix,iy){
  r(c,x+10,y+2,3,.5,'#719aa7');r(c,x+1,y+15,6,.5,'#173c52');
  for(let i=0;i<3;i++)r(c,x+n(ix+i,iy,37)*13,y+2+n(ix,iy+i,7)*12,1,.5,'#7db5b8');
 }
-function tile(c,t,x,y,ix,iy,biome,cleared){
+function rawTile(c,t,x,y,ix,iy,biome,cleared){
  const theme=P[biome]||P.spring;
  soil(c,x,y,ix,iy,theme);
  if([0,9,10,11].includes(t)){
@@ -128,6 +128,25 @@ function tile(c,t,x,y,ix,iy,biome,cleared){
  }
  // Subpixel borders give each tile a crisp but not sterile presentation.
  if(t===2||t===7||t===8)r(c,x,y+15.5,16,.5,'#413f3755');
+}
+/* Cached 32x32 atlas cells. A scene uses the same tile pixels across hundreds
+   of frames, so rasterize only once per world coordinate and terrain state. */
+const tileCache=new Map();
+function tile(c,t,x,y,ix,iy,biome,cleared){
+ const doc=root.document;
+ if(!doc||typeof doc.createElement!=='function')return rawTile(c,t,x,y,ix,iy,biome,cleared);
+ const key=biome+':'+t+':'+ix+':'+iy+':'+(cleared?1:0);
+ let cached=tileCache.get(key);
+ if(!cached){
+  cached=doc.createElement('canvas');cached.width=32;cached.height=32;
+  const buffer=cached.getContext?.('2d');
+  if(!buffer)return rawTile(c,t,x,y,ix,iy,biome,cleared);
+  buffer.imageSmoothingEnabled=false;buffer.setTransform(2,0,0,2,0,0);
+  rawTile(buffer,t,0,0,ix,iy,biome,cleared);
+  tileCache.set(key,cached);
+  if(tileCache.size>800)tileCache.delete(tileCache.keys().next().value);
+ }
+ c.drawImage(cached,snap(x),snap(y),16,16);
 }
 function actor(c,x,y,kind=0,face=2,phase=0,scale=1){
  c.save();c.translate(snap(x),snap(y));c.scale(scale,scale);
