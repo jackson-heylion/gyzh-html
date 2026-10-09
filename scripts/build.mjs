@@ -2,7 +2,7 @@ import { copyFile, mkdir, rm, stat } from 'node:fs/promises';
 import { join } from 'node:path';
 const root = new URL('../', import.meta.url);
 const output = new URL('../dist/', import.meta.url);
-const names = ['index.html', 'game.js', 'style.css', 'favicon.svg'];
+const names = ['index.html', 'game.js', 'hd-art.js', 'style.css', 'favicon.svg'];
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 for (const name of names) {
