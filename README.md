@@ -52,6 +52,21 @@ npm run build
 
 也可以使用 Python：`python3 -m http.server 4173`。
 
+## GitHub Pages 在线游玩（推荐）
+
+预期网站：**https://jackson-heylion.github.io/gyzh-html/**
+
+项目已包含 [自动部署工作流](.github/workflows/pages.yml)：每次推送到 `main`，先运行游戏烟雾测试，再构建 `dist/` 并上传 GitHub Pages。
+
+**首次发布需要仓库管理员启用 Pages（只做一次）：**
+
+1. 打开 [仓库 Settings → Pages](https://github.com/jackson-heylion/gyzh-html/settings/pages)。
+2. 在 **Build and deployment → Source** 选择 **GitHub Actions**。
+3. 打开 [Deploy game to GitHub Pages](https://github.com/jackson-heylion/gyzh-html/actions/workflows/pages.yml)，点击 **Run workflow** 选择 `main`；也可重新运行先前失败的部署任务。
+4. 等待工作流两项任务 `Test and package site` / `Publish playable game` 都显示绿色成功后，访问上方网站。
+
+> 注意：只提交工作流不会替账号启用 Pages。若报错 `Failed to create deployment (status: 404)`，通常是 Pages 未启用；启用并重跑部署即可。本游戏全部资源使用相对路径，可以从 `/gyzh-html/` 子路径加载。
+
 ## 部署到 ChatGPT Sites
 
 本工程是**标准静态网页**，不依赖特定的 ChatGPT 运行时。
