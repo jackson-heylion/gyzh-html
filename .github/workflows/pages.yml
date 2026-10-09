@@ -34,6 +34,7 @@ jobs:
         run: |
           test -s dist/index.html
           test -s dist/game.js
+          test -s dist/hd-art.js
           test -s dist/style.css
           test -s dist/favicon.svg
       - name: Upload Pages site
